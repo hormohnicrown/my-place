@@ -241,8 +241,11 @@ export async function getActiveDisputes() {
     if (error) throw error
 
     // Simulate dispute data - in production this would come from disputes table
-    const disputesData = (data || []).map(booking => ({
+    const disputesData = (data || []).map((booking: any) => ({
       ...booking,
+      client: Array.isArray(booking.client) ? booking.client[0] : booking.client,
+      merchant: Array.isArray(booking.merchant) ? booking.merchant[0] : booking.merchant,
+      listing: Array.isArray(booking.listing) ? booking.listing[0] : booking.listing,
       dispute_reason: 'Payment dispute',
       dispute_status: 'open' as const,
     }))
@@ -312,8 +315,10 @@ export async function getFlaggedBookings() {
     if (error) throw error
 
     // Simulate flagged data - in production this would come from flags table
-    const flaggedData = (data || []).map(booking => ({
+    const flaggedData = (data || []).map((booking: any) => ({
       ...booking,
+      client: Array.isArray(booking.client) ? booking.client[0] : booking.client,
+      merchant: Array.isArray(booking.merchant) ? booking.merchant[0] : booking.merchant,
       flagged_reason: booking.price_agreed >= 100000 
         ? 'High value transaction' 
         : 'Multiple cancellations',
@@ -423,7 +428,7 @@ export async function getPlatformStats() {
     // Get user counts
     const { data: userCounts } = await supabase
       .from('users')
-      .select('role, verification_status')
+      .select('role, verification_status, created_at')
 
     // Get booking counts
     const { data: bookingCounts } = await supabase

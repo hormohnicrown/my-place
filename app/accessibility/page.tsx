@@ -229,7 +229,6 @@ export default function AccessibilityPage() {
               <p className="text-sm text-gray-600 mt-1">
                 Better functionality when internet connection is poor or intermittent
               </p>
-              <p className="text-xs text-gray-500 mt-1">Target completion: Phase 6</p>
             </div>
           </div>
         </section>

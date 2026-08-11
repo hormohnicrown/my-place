@@ -4,6 +4,10 @@
 -- Fix ratings table to reference booking_requests instead of bookings
 -- Update schema and functions for two-way rating system
 
+-- Ensure users table has rating columns for client rating tracking
+ALTER TABLE users ADD COLUMN IF NOT EXISTS rating_avg DECIMAL(3, 2) DEFAULT 0.0 CHECK (rating_avg >= 0 AND rating_avg <= 5);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS rating_count INTEGER DEFAULT 0;
+
 -- Drop existing ratings table if it exists (since we need to change the reference)
 DROP TABLE IF EXISTS ratings CASCADE;
 

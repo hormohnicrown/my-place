@@ -10,18 +10,24 @@ import GPSHistory from '@/components/gps/GPSHistory'
 import CommissionTracker from '@/components/commission/CommissionTracker'
 import TwoWayRating from '@/components/ratings/TwoWayRating'
 
-const STATUS_COLORS = {
+const STATUS_COLORS: Record<string, string> = {
   pending: 'bg-yellow-100 text-yellow-800 border-yellow-200',
   accepted: 'bg-green-100 text-green-800 border-green-200',
   declined: 'bg-red-100 text-red-800 border-red-200',
-  cancelled: 'bg-gray-100 text-gray-800 border-gray-200'
+  cancelled: 'bg-gray-100 text-gray-800 border-gray-200',
+  checked_in: 'bg-blue-100 text-blue-800 border-blue-200',
+  in_progress: 'bg-purple-100 text-purple-800 border-purple-200',
+  completed: 'bg-emerald-100 text-emerald-800 border-emerald-200'
 }
 
-const STATUS_LABELS = {
+const STATUS_LABELS: Record<string, string> = {
   pending: 'Pending Review',
   accepted: 'Accepted',
   declined: 'Declined',
-  cancelled: 'Cancelled'
+  cancelled: 'Cancelled',
+  checked_in: 'Checked In',
+  in_progress: 'In Progress',
+  completed: 'Completed'
 }
 
 export default function MerchantBookingsPage() {
@@ -154,18 +160,6 @@ export default function MerchantBookingsPage() {
           </p>
         </div>
 
-        {/* Phase 4 - Booking Actions Now Available */}
-        <div className="mb-8 p-4 bg-green-50 border border-green-200 rounded-lg">
-          <div className="flex items-start">
-            <Calendar className="h-5 w-5 text-green-600 mt-0.5 mr-3 flex-shrink-0" />
-            <div>
-              <h3 className="text-sm font-medium text-green-800">Phase 4 - Booking Management Active</h3>
-              <p className="text-sm text-green-700 mt-1">
-                You can now accept or decline booking requests. Accepting a request will share your full address with the client and begin the service workflow including GPS check-in/out requirements.
-              </p>
-            </div>
-          </div>
-        </div>
 
         {/* Error State */}
         {error && (
@@ -268,6 +262,7 @@ export default function MerchantBookingsPage() {
         {selectedRequest && (
           <RequestDetailModal 
             request={selectedRequest}
+            currentUser={currentUser}
             onClose={() => setSelectedRequest(null)}
             onAccept={() => handleStatusUpdate(selectedRequest.id, 'accepted')}
             onDecline={() => handleStatusUpdate(selectedRequest.id, 'declined')}
@@ -476,13 +471,15 @@ function RequestDetailModal({
   onClose,
   onAccept,
   onDecline,
-  isProcessing = false
+  isProcessing = false,
+  currentUser
 }: { 
   request: MerchantBookingRequest
   onClose: () => void
   onAccept?: () => void
   onDecline?: () => void
   isProcessing?: boolean
+  currentUser?: any
 }) {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)

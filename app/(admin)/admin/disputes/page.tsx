@@ -16,7 +16,7 @@ export default async function DisputesManagementPage() {
   }
 
   const disputesResult = await getActiveDisputes()
-  const disputes = disputesResult.success ? disputesResult.data : []
+  const disputes: any[] = (disputesResult.success && disputesResult.data) ? disputesResult.data : []
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -39,7 +39,7 @@ export default async function DisputesManagementPage() {
       plumbing: 'bg-blue-100 text-blue-800',
     }
     return (
-      <Badge variant="secondary" className={colors[category] || 'bg-gray-100 text-gray-800'}>
+      <Badge variant="secondary" className={colors[category as keyof typeof colors] || 'bg-gray-100 text-gray-800'}>
         {category.charAt(0).toUpperCase() + category.slice(1)}
       </Badge>
     )

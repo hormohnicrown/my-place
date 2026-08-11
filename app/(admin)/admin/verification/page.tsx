@@ -17,7 +17,7 @@ export default async function VerificationManagementPage() {
   }
 
   const verificationsResult = await getPendingVerifications()
-  const verifications = verificationsResult.success ? verificationsResult.data : []
+  const verifications = (verificationsResult.success && verificationsResult.data) ? verificationsResult.data : []
 
   const getStatusBadge = (status: string) => {
     switch (status) {

@@ -136,7 +136,7 @@ async function testUserCanOnlyAccessOwnBookings(supabase: any): Promise<RLSValid
     }
 
     // Verify all returned bookings involve the current user
-    const invalidAccess = data?.some(booking => 
+    const invalidAccess = data?.some((booking: any) => 
       booking.client_user_id !== currentUser.id && 
       booking.merchant_user_id !== currentUser.id
     ) || false
@@ -178,7 +178,7 @@ async function testAddressPrivacyEnforcement(supabase: any): Promise<RLSValidati
     }
 
     // Check that addresses are only present for accepted+ bookings
-    const addressLeakage = data?.some(booking => 
+    const addressLeakage = data?.some((booking: any) => 
       booking.client_address && 
       !['accepted', 'in_progress', 'completed'].includes(booking.status)
     ) || false
@@ -228,7 +228,7 @@ async function testCommissionDataProtection(supabase: any): Promise<RLSValidatio
 
     // If user is client, they shouldn't see commission details
     if (currentUser?.role === 'client') {
-      const hasCommissionData = data?.some(booking => 
+      const hasCommissionData = data?.some((booking: any) => 
         booking.commission_rate_applied !== null || 
         booking.commission_amount !== null ||
         booking.payment_notes !== null

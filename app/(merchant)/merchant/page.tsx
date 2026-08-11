@@ -153,7 +153,7 @@ export default async function MerchantDashboard() {
                       </Button>
                     </Link>
                   </div>
-                  {recentListings.slice(0, 2).map((listing) => (
+                  {recentListings.slice(0, 2).map((listing: any) => (
                     <div 
                       key={listing.id} 
                       className="p-3 border rounded-lg flex justify-between items-center"
@@ -270,33 +270,6 @@ export default async function MerchantDashboard() {
           </CardContent>
         </Card>
 
-        {/* Phase 1 Notice */}
-        <Card className="bg-green-50 border-green-200">
-          <CardHeader>
-            <CardTitle className="text-green-900">Phase 1 - Dashboard Shell</CardTitle>
-          </CardHeader>
-          <CardContent className="text-sm text-green-800">
-            <p className="mb-2">
-              <strong>You've successfully completed Phase 1 authentication!</strong>
-            </p>
-            <p className="mb-3">
-              This dashboard is a shell showing the role-based routing is working. 
-              Phase 2 will add:
-            </p>
-            <ul className="list-disc list-inside space-y-1 mb-3">
-              <li>Create and manage service listings</li>
-              <li>Receive and respond to booking requests</li>
-              <li>GPS check-in/check-out for service tracking</li>
-              <li>Two-way ratings and reviews</li>
-              <li>Import off-platform testimonials (WhatsApp/Instagram)</li>
-            </ul>
-            <p className="text-xs">
-              <strong>Verification Status:</strong> ✓ ID Verified | 
-              <strong> Service Area:</strong> {user.city}, {user.state} | 
-              <strong> Category:</strong> {merchantProfile?.category || 'Not set'}
-            </p>
-          </CardContent>
-        </Card>
       </main>
     </div>
   )

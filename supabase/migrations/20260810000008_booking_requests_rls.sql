@@ -149,10 +149,11 @@ USING (
   AND status IN ('accepted', 'in_progress', 'completed')
 )
 WITH CHECK (
-  -- Can only modify GPS and timestamp fields, not core booking details
-  client_user_id = OLD.client_user_id
-  AND merchant_user_id = OLD.merchant_user_id  
-  AND service_details = OLD.service_details
+  auth.uid() IS NOT NULL
+  AND (
+    client_user_id = (SELECT id FROM users WHERE auth_user_id = auth.uid())
+    OR merchant_user_id = (SELECT id FROM users WHERE auth_user_id = auth.uid())
+  )
 );
 
 -- =============================================================================

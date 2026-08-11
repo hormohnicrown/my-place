@@ -16,7 +16,7 @@ export default async function FlaggedBookingsPage() {
   }
 
   const flaggedResult = await getFlaggedBookings()
-  const flaggedBookings = flaggedResult.success ? flaggedResult.data : []
+  const flaggedBookings: any[] = flaggedResult.success ? (flaggedResult.data as any[]) : []
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
@@ -28,7 +28,7 @@ export default async function FlaggedBookingsPage() {
       'cancelled': { color: 'border-red-300 text-red-700 bg-red-50', label: 'Cancelled' },
     }
 
-    const config = statusConfig[status] || statusConfig['requested']
+    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig['requested']
     return <Badge variant="outline" className={config.color}>{config.label}</Badge>
   }
 
@@ -40,7 +40,7 @@ export default async function FlaggedBookingsPage() {
       plumbing: 'bg-blue-100 text-blue-800',
     }
     return (
-      <Badge variant="secondary" className={colors[category] || 'bg-gray-100 text-gray-800'}>
+      <Badge variant="secondary" className={colors[category as keyof typeof colors] || 'bg-gray-100 text-gray-800'}>
         {category.charAt(0).toUpperCase() + category.slice(1)}
       </Badge>
     )

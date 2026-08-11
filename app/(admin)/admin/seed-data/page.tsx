@@ -183,7 +183,7 @@ export default async function SeedDataManagementPage() {
                       <span className="font-semibold capitalize">{category}</span>
                       <span className="text-2xl">{categoryInfo.icon}</span>
                     </div>
-                    <div className="text-2xl font-bold">{count}</div>
+                    <div className="text-2xl font-bold">{count as number}</div>
                     <div className="text-sm opacity-75">testimonials ready</div>
                   </div>
                 )

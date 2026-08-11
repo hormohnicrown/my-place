@@ -13,9 +13,25 @@ ADD COLUMN IF NOT EXISTS payment_status TEXT DEFAULT 'pending' CHECK (payment_st
 ADD COLUMN IF NOT EXISTS payment_notes TEXT;
 
 -- Add constraints
-ALTER TABLE booking_requests 
-ADD CONSTRAINT IF NOT EXISTS valid_commission_rate_br CHECK (commission_rate_applied >= 0 AND commission_rate_applied <= 1),
-ADD CONSTRAINT IF NOT EXISTS valid_price_agreed_br CHECK (price_agreed IS NULL OR price_agreed >= 0);
+-- Postgres does not support ADD CONSTRAINT IF NOT EXISTS, so guard each one.
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'valid_commission_rate_br'
+  ) THEN
+    ALTER TABLE booking_requests
+      ADD CONSTRAINT valid_commission_rate_br
+      CHECK (commission_rate_applied >= 0 AND commission_rate_applied <= 1);
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'valid_price_agreed_br'
+  ) THEN
+    ALTER TABLE booking_requests
+      ADD CONSTRAINT valid_price_agreed_br
+      CHECK (price_agreed IS NULL OR price_agreed >= 0);
+  END IF;
+END $$;
 
 -- Comments for documentation
 COMMENT ON COLUMN booking_requests.price_agreed IS 'Final agreed price between client and merchant';

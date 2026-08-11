@@ -116,16 +116,6 @@ export default function Home() {
           </Link>
         </div>
 
-        {/* Phase Status */}
-        <div className="mt-12 p-6 bg-blue-50 border border-blue-200 rounded-lg">
-          <p className="text-sm text-blue-900 font-medium mb-2">
-            ✅ Phase 0 + Phase 1 Complete
-          </p>
-          <p className="text-xs text-blue-700">
-            Authentication, onboarding, ID verification gate, and role-based dashboards are now live.
-            Click "Get Started" to test the full auth flow.
-          </p>
-        </div>
       </main>
     </div>
   );

@@ -326,7 +326,7 @@ export default function TestimonialsPage() {
             trust and transparency. This helps clients understand the difference between:
           </p>
           <ul className="text-sm text-blue-800 space-y-1 ml-4">
-            <li>• <strong>Verified reviews:</strong> From completed bookings on My Place (coming in Phase 4)</li>
+            <li>• <strong>Verified reviews:</strong> From completed bookings on My Place</li>
             <li>• <strong>Off-platform testimonials:</strong> Shared by you from other platforms</li>
           </ul>
           <p className="text-xs text-blue-700 mt-3">

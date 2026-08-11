@@ -759,16 +759,16 @@ export async function getMerchantBookingRequests(): Promise<ActionResult> {
         payment_status: req.payment_status,
         payment_notes: req.payment_notes,
         client: {
-          name: req.clients.name,
+          name: (req as any).clients?.name || '',
           // ADDRESS PRIVACY: Only city shown for pending requests
-          city: req.clients.city,
-          profile_photo_url: req.clients.profile_photo_url,
+          city: (req as any).clients?.city || '',
+          profile_photo_url: (req as any).clients?.profile_photo_url || null,
           rating_avg: clientRatingMap[req.client_user_id]?.rating_avg || 0,
           rating_count: clientRatingMap[req.client_user_id]?.rating_count || 0,
         },
-        listing: req.listings ? {
-          title: req.listings.title,
-          price: req.listings.price
+        listing: (req as any).listings ? {
+          title: (req as any).listings.title,
+          price: (req as any).listings.price
         } : undefined
       }
 

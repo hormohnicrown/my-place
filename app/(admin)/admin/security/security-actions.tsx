@@ -76,7 +76,7 @@ export function SecurityActions() {
     try {
       const result = await testRLSPolicies()
       
-      if (result.success) {
+      if (result.success && result.data) {
         alert(`RLS Tests Complete:\n\n${result.data.map((r: any) => 
           `${r.test}: ${r.status}\n${r.details}`
         ).join('\n\n')}`)

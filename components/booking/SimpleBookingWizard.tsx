@@ -72,7 +72,7 @@ export default function SimpleBookingWizard({
       case 'service':
         return bookingData.serviceDetails.trim().length >= 10
       case 'datetime':
-        return bookingData.preferredDate && bookingData.preferredTimeStart && bookingData.preferredTimeEnd
+        return Boolean(bookingData.preferredDate && bookingData.preferredTimeStart && bookingData.preferredTimeEnd)
       case 'location':
         return bookingData.clientAddress.trim().length >= 10
       case 'review':
@@ -106,7 +106,7 @@ export default function SimpleBookingWizard({
 
     try {
       const result = await createBookingRequest({
-        merchant_id: bookingData.merchantId,
+        merchant_profile_id: bookingData.merchantId,
         service_details: bookingData.serviceDetails,
         preferred_date: bookingData.preferredDate,
         preferred_time_start: bookingData.preferredTimeStart,

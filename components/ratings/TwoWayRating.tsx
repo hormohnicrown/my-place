@@ -62,10 +62,10 @@ export default function TwoWayRating({
         // Check if current user can rate the other party
         if (currentUserRole === 'merchant') {
           const clientValidation = await validateRatingAccess(bookingId, currentUserId, clientUserId)
-          setCanRateClient(clientValidation.success && clientValidation.can_rate)
+          setCanRateClient(Boolean(clientValidation.success && clientValidation.can_rate))
         } else {
           const merchantValidation = await validateRatingAccess(bookingId, currentUserId, merchantUserId)
-          setCanRateMerchant(merchantValidation.success && merchantValidation.can_rate)
+          setCanRateMerchant(Boolean(merchantValidation.success && merchantValidation.can_rate))
         }
       }
 

@@ -9,6 +9,18 @@
 -- GPS CHECK-IN/OUT TABLE
 -- =============================================================================
 
+-- Create custom enum for check-in types (must exist before the table below uses it)
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'check_in_type') THEN
+    CREATE TYPE check_in_type AS ENUM (
+      'service_start',    -- Merchant arrives and starts service
+      'service_complete', -- Merchant completes service
+      'client_confirm'    -- Client confirms service received (optional)
+    );
+  END IF;
+END $$;
+
 -- Create GPS tracking table for service delivery
 CREATE TABLE IF NOT EXISTS gps_checkins (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -72,14 +84,7 @@ ADD COLUMN IF NOT EXISTS gps_checkin_required BOOLEAN DEFAULT true,
 ADD COLUMN IF NOT EXISTS service_started_at TIMESTAMPTZ,
 ADD COLUMN IF NOT EXISTS service_completed_at TIMESTAMPTZ;
 
--- Update status enum to include GPS workflow states
-ALTER TYPE booking_status ADD VALUE IF NOT EXISTS 'checked_in';
-ALTER TYPE booking_status ADD VALUE IF NOT EXISTS 'in_progress';
-ALTER TYPE booking_status ADD VALUE IF NOT EXISTS 'completed';
-
--- Update booking_requests to use the expanded enum
-ALTER TABLE booking_requests 
-ALTER COLUMN status TYPE booking_status USING status::text::booking_status;
+-- Note: booking_status enum already includes all states ('checked_in', 'in_progress', 'completed') from initial creation.
 
 -- =============================================================================
 -- GPS FUNCTIONS

@@ -12,7 +12,7 @@ CREATE TYPE user_role AS ENUM ('client', 'merchant');
 CREATE TYPE verification_status AS ENUM ('unverified', 'pending', 'id_verified', 'failed');
 CREATE TYPE service_category AS ENUM ('tailoring', 'carpentry', 'welding', 'plumbing');
 CREATE TYPE merchant_status AS ENUM ('active', 'inactive', 'under_review');
-CREATE TYPE booking_status AS ENUM ('requested', 'accepted', 'declined', 'checked_in', 'completed', 'cancelled');
+CREATE TYPE booking_status AS ENUM ('requested', 'pending', 'accepted', 'declined', 'checked_in', 'in_progress', 'completed', 'cancelled');
 CREATE TYPE payment_status AS ENUM ('pending', 'off_platform_completed', 'settled'); -- v1: off-platform tracking
 
 -- =============================================================================
@@ -283,10 +283,12 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Trigger: Update merchant rating when a new rating is added
+-- Postgres does not allow a subquery in a trigger WHEN condition, so the
+-- merchant check lives inside update_merchant_rating_avg() instead. When the
+-- rated user is a client, the UPDATE matches no merchant_profiles row (no-op).
 CREATE TRIGGER update_merchant_rating_on_new_rating
 AFTER INSERT ON ratings
 FOR EACH ROW
-WHEN (NEW.rated_id IN (SELECT user_id FROM users WHERE role = 'merchant'))
 EXECUTE FUNCTION update_merchant_rating_avg();
 
 -- =============================================================================

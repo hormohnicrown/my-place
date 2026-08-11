@@ -44,7 +44,7 @@ export default async function TestimonialPreviewPage() {
       welding: 'bg-red-100 text-red-800',
       plumbing: 'bg-blue-100 text-blue-800'
     }
-    return colors[category] || 'bg-gray-100 text-gray-800'
+    return colors[category as keyof typeof colors] || 'bg-gray-100 text-gray-800'
   }
 
   return (

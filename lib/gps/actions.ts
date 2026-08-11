@@ -98,8 +98,9 @@ export async function recordGPSCheckIn(data: GPSCheckInData): Promise<ActionResu
       return { success: false, error: 'Failed to record GPS check-in' }
     }
 
-    if (!result?.success) {
-      return { success: false, error: result?.message || 'GPS check-in failed' }
+    const res = result as any
+    if (!res?.success) {
+      return { success: false, error: res?.message || 'GPS check-in failed' }
     }
 
     // Revalidate relevant pages
@@ -109,8 +110,8 @@ export async function recordGPSCheckIn(data: GPSCheckInData): Promise<ActionResu
     return { 
       success: true, 
       data: { 
-        checkin_id: result.checkin_id,
-        message: result.message,
+        checkin_id: res.checkin_id,
+        message: res.message,
         checkin_type: data.checkin_type
       }
     }
@@ -167,7 +168,7 @@ export async function getBookingGPSHistory(bookingId: string): Promise<ActionRes
       return { success: false, error: 'Failed to load GPS history' }
     }
 
-    const formattedHistory: GPSCheckInRecord[] = (gpsHistory || []).map(record => ({
+    const formattedHistory: GPSCheckInRecord[] = (gpsHistory || []).map((record: any) => ({
       id: record.id,
       user_name: record.user_name,
       user_role: record.user_role,

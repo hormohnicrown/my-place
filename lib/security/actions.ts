@@ -202,7 +202,7 @@ export async function generateSecurityReport() {
     const auditResult = await runSecurityAudit()
     const recommendationsResult = await getSecurityRecommendations()
 
-    if (!auditResult.success) {
+    if (!auditResult.success || !auditResult.data) {
       throw new Error('Failed to run security audit')
     }
 
@@ -222,7 +222,7 @@ export async function generateSecurityReport() {
         low: auditResult.data.score.low
       },
       checks: auditResult.data.checks,
-      recommendations: recommendationsResult.success ? recommendationsResult.data.recommendations : [],
+      recommendations: (recommendationsResult.success && recommendationsResult.data) ? recommendationsResult.data.recommendations : [],
       criticalIssues: auditResult.data.checks.filter(c => 
         c.level === 'critical' && c.status === 'fail'
       ),

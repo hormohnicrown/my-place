@@ -248,7 +248,7 @@ export default function AccessibleNavigation({ userRole, userName }: NavigationP
               <li className="flex items-center">
                 <ChevronRight className="w-4 h-4 text-gray-400 mx-1" aria-hidden="true" />
                 <span className="text-gray-600 font-medium">
-                  {pathname.split('/').pop()?.charAt(0).toUpperCase() + pathname.split('/').pop()?.slice(1)}
+                  {((pathname.split('/').pop() || '').charAt(0).toUpperCase()) + (pathname.split('/').pop() || '').slice(1)}
                 </span>
               </li>
             </ol>

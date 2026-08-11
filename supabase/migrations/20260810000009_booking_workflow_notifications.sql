@@ -253,6 +253,9 @@ BEGIN
                     true   -- send push
                 );
             END IF;
+        ELSE
+            -- No notification for other statuses (e.g. requested, checked_in)
+            NULL;
     END CASE;
 
     RETURN NEW;
@@ -383,6 +386,16 @@ BEGIN
                 RAISE EXCEPTION 'Invalid status transition from in_progress to %', NEW.status;
             END IF;
             
+        WHEN 'requested' THEN
+            IF NEW.status NOT IN ('pending', 'accepted', 'declined', 'cancelled') THEN
+                RAISE EXCEPTION 'Invalid status transition from requested to %', NEW.status;
+            END IF;
+            
+        WHEN 'checked_in' THEN
+            IF NEW.status NOT IN ('in_progress', 'completed', 'cancelled') THEN
+                RAISE EXCEPTION 'Invalid status transition from checked_in to %', NEW.status;
+            END IF;
+            
         WHEN 'declined' THEN
             -- Declined is terminal - no transitions allowed
             RAISE EXCEPTION 'Cannot change status from declined';
@@ -394,6 +407,10 @@ BEGIN
         WHEN 'cancelled' THEN
             -- Cancelled is terminal - no transitions allowed  
             RAISE EXCEPTION 'Cannot change status from cancelled';
+            
+        ELSE
+            -- Fallback for any unhandled status
+            NULL;
     END CASE;
 
     RETURN NEW;
@@ -514,7 +531,8 @@ SET search_path = public
 LANGUAGE plpgsql
 AS $$
 DECLARE
-    deleted_count INTEGER;
+    deleted_count INTEGER := 0;
+    step_count INTEGER := 0;
 BEGIN
     -- Delete read notifications older than 30 days
     DELETE FROM notifications
@@ -528,8 +546,9 @@ BEGIN
     WHERE read_at IS NULL
     AND created_at < NOW() - INTERVAL '90 days';
     
-    GET DIAGNOSTICS deleted_count = deleted_count + ROW_COUNT;
+    GET DIAGNOSTICS step_count = ROW_COUNT;
     
+    deleted_count := deleted_count + step_count;
     RETURN deleted_count;
 END;
 $$;

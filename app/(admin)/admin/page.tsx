@@ -15,7 +15,7 @@ export default async function AdminDashboard() {
 
   // Get real platform stats
   const statsResult = await getPlatformStats()
-  const adminStats = statsResult.success ? statsResult.data : {
+  const adminStats = (statsResult.success && statsResult.data) ? statsResult.data : {
     totalUsers: 0,
     pendingVerifications: 0,
     activeDisputes: 0,

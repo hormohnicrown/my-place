@@ -124,7 +124,7 @@ export async function searchMerchants(
 
       // Filter by price range (PostGIS function doesn't handle this)
       const results: MerchantSearchResult[] = (merchants || [])
-        .filter(merchant => {
+        .filter((merchant: any) => {
           if (filters.minPrice !== undefined && merchant.price_range_min !== null) {
             if (merchant.price_range_min < filters.minPrice) return false
           }
@@ -133,7 +133,7 @@ export async function searchMerchants(
           }
           return true
         })
-        .map(merchant => ({
+        .map((merchant: any) => ({
           id: merchant.merchant_profile_id,
           user_id: merchant.user_id,
           name: merchant.name,
@@ -199,23 +199,26 @@ export async function searchMerchants(
     }
 
     // Build results without distance calculation
-    const results: MerchantSearchResult[] = (merchants || []).map(merchant => ({
-      id: merchant.id,
-      user_id: merchant.user_id,
-      name: merchant.users.name,
-      category: merchant.category,
-      description: merchant.description,
-      price_range_min: merchant.price_range_min,
-      price_range_max: merchant.price_range_max,
-      rating_avg: merchant.rating_avg,
-      rating_count: merchant.rating_count,
-      profile_photo_url: merchant.users.profile_photo_url,
-      // ADDRESS PRIVACY: Only city, never full address
-      city: merchant.users.city,
-      service_area_radius_km: merchant.service_area_radius_km,
-      // No distance when no user location provided
-      distance_km: undefined,
-    }))
+    const results: MerchantSearchResult[] = (merchants || []).map((merchant: any) => {
+      const u = merchant.users as any
+      return {
+        id: merchant.id,
+        user_id: merchant.user_id,
+        name: u?.name || '',
+        category: merchant.category,
+        description: merchant.description,
+        price_range_min: merchant.price_range_min,
+        price_range_max: merchant.price_range_max,
+        rating_avg: merchant.rating_avg,
+        rating_count: merchant.rating_count,
+        profile_photo_url: u?.profile_photo_url || null,
+        // ADDRESS PRIVACY: Only city, never full address
+        city: u?.city || '',
+        service_area_radius_km: merchant.service_area_radius_km,
+        // No distance when no user location provided
+        distance_km: undefined,
+      }
+    })
 
     return { success: true, data: results }
   } catch (error) {
@@ -404,14 +407,14 @@ export async function searchListings(
     // Process results with distance calculation and address privacy
     const results: ListingSearchResult[] = []
 
-    for (const listing of listings || []) {
-      const merchant = listing.merchant_profiles
-      const userData = merchant.users
+    for (const listing of (listings as any[]) || []) {
+      const merchant = listing.merchant_profiles as any
+      const userData = merchant?.users as any
       
       // Calculate distance if user location provided
       let distance_km: number | undefined
 
-      if (filters.userLat && filters.userLng && userData.geo_coordinates) {
+      if (filters.userLat && filters.userLng && userData?.geo_coordinates) {
         const { data: distanceResult } = await supabase.rpc(
           'calculate_distance_coords',
           {
@@ -422,7 +425,7 @@ export async function searchListings(
           }
         ).single()
 
-        distance_km = distanceResult?.distance_km
+        distance_km = (distanceResult as any)?.distance_km
       }
 
       // Apply distance filter (if user location and max distance specified)
@@ -431,7 +434,7 @@ export async function searchListings(
       }
 
       // Apply service area filter (is user within merchant's service area?)
-      if (distance_km && distance_km > merchant.service_area_radius_km) {
+      if (distance_km && merchant?.service_area_radius_km && distance_km > merchant.service_area_radius_km) {
         continue
       }
 
@@ -447,12 +450,12 @@ export async function searchListings(
         merchant: {
           id: merchant.id,
           user_id: merchant.user_id,
-          name: userData.name,
+          name: userData?.name || '',
           rating_avg: merchant.rating_avg,
           rating_count: merchant.rating_count,
-          profile_photo_url: userData.profile_photo_url,
+          profile_photo_url: userData?.profile_photo_url || null,
           // ADDRESS PRIVACY: Only city, never full address
-          city: userData.city,
+          city: userData?.city || '',
           service_area_radius_km: merchant.service_area_radius_km,
           distance_km,
         }
@@ -502,7 +505,7 @@ export async function getListingDetails(listingId: string): Promise<ActionResult
           id,
           user_id,
           category,
-          description as merchant_description,
+          merchant_description:description,
           rating_avg,
           rating_count,
           service_area_radius_km,
@@ -527,7 +530,7 @@ export async function getListingDetails(listingId: string): Promise<ActionResult
       return { success: false, error: 'Listing not found' }
     }
 
-    const merchant = listing.merchant_profiles
+    const merchant = listing.merchant_profiles as any
     
     // Build safe listing details (ADDRESS PRIVACY enforced)
     const listingDetails = {
@@ -673,13 +676,14 @@ export async function createBookingRequest(
         return { success: false, error: 'Listing not found or inactive' }
       }
 
-      merchantUserId = listing.merchant_profiles.user_id
+      const mProfiles = (listing.merchant_profiles as any)
+      merchantUserId = mProfiles.user_id
       
-      if (listing.merchant_profiles.status !== 'active') {
+      if (mProfiles.status !== 'active') {
         return { success: false, error: 'Merchant profile is not active' }
       }
       
-      if (listing.merchant_profiles.users.verification_status !== 'id_verified') {
+      if (mProfiles.users.verification_status !== 'id_verified') {
         return { success: false, error: 'Merchant is not verified' }
       }
 
@@ -699,13 +703,14 @@ export async function createBookingRequest(
         return { success: false, error: 'Merchant not found' }
       }
 
+      const mUsers = (merchant as any).users
       merchantUserId = merchant.user_id
       
       if (merchant.status !== 'active') {
         return { success: false, error: 'Merchant profile is not active' }
       }
       
-      if (merchant.users.verification_status !== 'id_verified') {
+      if (mUsers.verification_status !== 'id_verified') {
         return { success: false, error: 'Merchant is not verified' }
       }
 
@@ -829,40 +834,44 @@ export async function getClientBookingRequests(): Promise<ActionResult> {
     }
 
     // Format results with ADDRESS PRIVACY for merchant data
-    const formattedRequests: BookingRequest[] = (requests || []).map(req => ({
-      id: req.id,
-      client_user_id: req.client_user_id,
-      merchant_user_id: req.merchant_user_id,
-      merchant_profile_id: req.merchant_profile_id,
-      listing_id: req.listing_id,
-      service_details: req.service_details,
-      preferred_date: req.preferred_date,
-      preferred_time_start: req.preferred_time_start,
-      preferred_time_end: req.preferred_time_end,
-      special_requirements: req.special_requirements,
-      status: req.status,
-      created_at: req.created_at,
-      client: {
-        name: 'You', // It's the client's own request
-        city: '', // Not needed for client view
-        profile_photo_url: null,
-        rating_avg: 0,
-        rating_count: 0
-      },
-      merchant: {
-        name: req.merchant_profiles.users.name,
-        category: req.merchant_profiles.category,
-        // ADDRESS PRIVACY: Only city shown
-        city: req.merchant_profiles.users.city,
-        profile_photo_url: req.merchant_profiles.users.profile_photo_url,
-        rating_avg: req.merchant_profiles.rating_avg,
-        rating_count: req.merchant_profiles.rating_count,
-      },
-      listing: req.listings ? {
-        title: req.listings.title,
-        price: req.listings.price
-      } : undefined
-    }))
+    const formattedRequests: BookingRequest[] = (requests || []).map(req => {
+      const mProfiles = (req as any).merchant_profiles
+      const mListings = (req as any).listings
+      return {
+        id: req.id,
+        client_user_id: req.client_user_id,
+        merchant_user_id: req.merchant_user_id,
+        merchant_profile_id: req.merchant_profile_id,
+        listing_id: req.listing_id,
+        service_details: req.service_details,
+        preferred_date: req.preferred_date,
+        preferred_time_start: req.preferred_time_start,
+        preferred_time_end: req.preferred_time_end,
+        special_requirements: req.special_requirements,
+        status: req.status,
+        created_at: req.created_at,
+        client: {
+          name: 'You', // It's the client's own request
+          city: '', // Not needed for client view
+          profile_photo_url: null,
+          rating_avg: 0,
+          rating_count: 0
+        },
+        merchant: {
+          name: mProfiles?.users?.name || '',
+          category: mProfiles?.category || '',
+          // ADDRESS PRIVACY: Only city shown
+          city: mProfiles?.users?.city || '',
+          profile_photo_url: mProfiles?.users?.profile_photo_url || null,
+          rating_avg: mProfiles?.rating_avg || 0,
+          rating_count: mProfiles?.rating_count || 0,
+        },
+        listing: mListings ? {
+          title: mListings.title,
+          price: mListings.price
+        } : undefined
+      }
+    })
 
     return { success: true, data: formattedRequests }
   } catch (error) {

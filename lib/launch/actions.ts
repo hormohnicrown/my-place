@@ -142,26 +142,26 @@ export async function getLaunchReadinessStatus() {
     // Get system health metrics
     const supabase = await createClient()
     
-    const { data: userCount } = await supabase
+    const { count: userCount } = await supabase
       .from('users')
-      .select('id', { count: 'exact', head: true })
+      .select('*', { count: 'exact', head: true })
     
-    const { data: merchantCount } = await supabase
+    const { count: merchantCount } = await supabase
       .from('merchant_profiles')
-      .select('id', { count: 'exact', head: true })
+      .select('*', { count: 'exact', head: true })
     
-    const { data: bookingCount } = await supabase
+    const { count: bookingCount } = await supabase
       .from('bookings')
-      .select('id', { count: 'exact', head: true })
+      .select('*', { count: 'exact', head: true })
 
     return {
       success: true,
       data: {
         readinessScore: score,
         systemMetrics: {
-          totalUsers: userCount || 0,
-          totalMerchants: merchantCount || 0,
-          totalBookings: bookingCount || 0,
+          totalUsers: userCount ?? 0,
+          totalMerchants: merchantCount ?? 0,
+          totalBookings: bookingCount ?? 0,
           environment: process.env.NODE_ENV || 'development'
         },
         checklist: launchChecklist
@@ -276,7 +276,7 @@ export async function generateLaunchReport() {
     const recommendationsResult = await getPreLaunchRecommendations()
     const automatedChecksResult = await runAutomatedChecks()
 
-    if (!readinessResult.success || !recommendationsResult.success) {
+    if (!readinessResult.success || !readinessResult.data || !recommendationsResult.success || !recommendationsResult.data) {
       throw new Error('Failed to generate launch report')
     }
 

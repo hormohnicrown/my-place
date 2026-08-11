@@ -286,7 +286,7 @@ function getPriceRange(category: string): { min: number; max: number } {
     plumbing: { min: 7000, max: 60000 }
   }
   
-  return ranges[category] || { min: 5000, max: 50000 }
+  return ranges[category as keyof typeof ranges] || { min: 5000, max: 50000 }
 }
 
 function calculateAverageRating(testimonials: OffPlatformTestimonial[]): number {
@@ -392,5 +392,5 @@ function getSampleListings(category: string) {
     ]
   }
   
-  return listingsByCategory[category] || []
+  return listingsByCategory[category as keyof typeof listingsByCategory] || []
 }

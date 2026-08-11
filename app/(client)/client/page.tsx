@@ -32,8 +32,8 @@ export default function ClientDashboard() {
     totalRequests: 0,
     recentRequests: []
   })
-  const [recentListings, setRecentListings] = useState([])
-  const [nearbyMerchants, setNearbyMerchants] = useState([])
+  const [recentListings, setRecentListings] = useState<any[]>([])
+  const [nearbyMerchants, setNearbyMerchants] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -60,8 +60,8 @@ export default function ClientDashboard() {
       if (bookingResult.success) {
         const requests = bookingResult.data || []
         setStats({
-          pendingRequests: requests.filter(r => r.status === 'pending').length,
-          acceptedRequests: requests.filter(r => r.status === 'accepted').length,
+          pendingRequests: requests.filter((r: any) => r.status === 'pending').length,
+          acceptedRequests: requests.filter((r: any) => r.status === 'accepted').length,
           totalRequests: requests.length,
           recentRequests: requests.slice(0, 3)
         })
