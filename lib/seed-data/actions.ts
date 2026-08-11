@@ -20,9 +20,7 @@ export type SeedDataResult = {
 async function requireAdmin() {
   const user = await getCurrentUser()
   
-  // In production, you'd want proper admin roles
-  // For now, we'll use merchant role as admin (temporary)
-  if (!user || user.role !== 'merchant') {
+  if (!user || user.role !== 'admin') {
     throw new Error('Admin access required for seed data operations')
   }
   

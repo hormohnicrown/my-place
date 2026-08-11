@@ -13,7 +13,19 @@ DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname='service_role') 
 
 -- auth schema + helpers Supabase injects
 CREATE SCHEMA IF NOT EXISTS auth;
-CREATE TABLE IF NOT EXISTS auth.users (id uuid PRIMARY KEY DEFAULT gen_random_uuid());
+CREATE TABLE IF NOT EXISTS auth.users (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  instance_id uuid,
+  email text,
+  encrypted_password text,
+  email_confirmed_at timestamptz,
+  raw_app_meta_data jsonb,
+  raw_user_meta_data jsonb,
+  created_at timestamptz,
+  updated_at timestamptz,
+  role text,
+  aud text
+);
 CREATE OR REPLACE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql STABLE AS $$ SELECT NULL::uuid $$;
 CREATE OR REPLACE FUNCTION auth.role() RETURNS text LANGUAGE sql STABLE AS $$ SELECT 'authenticated'::text $$;
 CREATE OR REPLACE FUNCTION auth.jwt() RETURNS jsonb LANGUAGE sql STABLE AS $$ SELECT '{}'::jsonb $$;
@@ -29,3 +41,8 @@ CREATE TABLE IF NOT EXISTS storage.objects (
   bucket_id text, name text
 );
 CREATE OR REPLACE FUNCTION storage.foldername(name text) RETURNS text[] LANGUAGE sql IMMUTABLE AS $$ SELECT string_to_array(name, '/') $$;
+
+-- Dummy pgcrypto stubs for local PostGIS/PGlite testing
+CREATE OR REPLACE FUNCTION gen_salt(type text) RETURNS text LANGUAGE sql IMMUTABLE AS $$ SELECT 'fake_salt'::text $$;
+CREATE OR REPLACE FUNCTION crypt(password text, salt text) RETURNS text LANGUAGE sql IMMUTABLE AS $$ SELECT 'fake_hash'::text $$;
+

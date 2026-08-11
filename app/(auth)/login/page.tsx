@@ -35,7 +35,13 @@ export default function LoginPage() {
     }
 
     const role = result.data?.existingUser?.role
-    router.push(role === 'merchant' ? '/merchant' : '/client')
+    if (role === 'admin') {
+      router.push('/admin')
+    } else if (role === 'merchant') {
+      router.push('/merchant')
+    } else {
+      router.push('/client')
+    }
   }
 
   const handleSignUp = async () => {

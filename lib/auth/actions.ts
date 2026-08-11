@@ -90,7 +90,7 @@ export type CreateUserProfileData = {
   name: string
   phone: string
   email?: string
-  role: 'client' | 'merchant'
+  role: 'client' | 'merchant' | 'admin'
   address: string
   city: string
   state: string

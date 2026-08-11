@@ -8,7 +8,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "postgis"; -- For geo coordinates
 
 -- Create custom types (enums)
-CREATE TYPE user_role AS ENUM ('client', 'merchant');
+CREATE TYPE user_role AS ENUM ('client', 'merchant', 'admin');
 CREATE TYPE verification_status AS ENUM ('unverified', 'pending', 'id_verified', 'failed');
 CREATE TYPE service_category AS ENUM ('tailoring', 'carpentry', 'welding', 'plumbing');
 CREATE TYPE merchant_status AS ENUM ('active', 'inactive', 'under_review');

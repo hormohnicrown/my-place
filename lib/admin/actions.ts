@@ -9,7 +9,7 @@ export type AdminUser = {
   name: string
   phone: string
   email: string | null
-  role: 'client' | 'merchant'
+  role: 'client' | 'merchant' | 'admin'
   verification_status: 'unverified' | 'pending' | 'id_verified' | 'failed'
   city: string | null
   state: string | null
@@ -51,10 +51,9 @@ export type BookingWithDetails = {
 async function requireAdmin() {
   const user = await getCurrentUser()
   
-  // In production, you'd want proper admin roles
-  // For now, we'll use merchant role as admin (temporary)
-  if (!user || user.role !== 'merchant') {
-    throw new Error('Admin access required')
+  // Enforce strict Super-Admin access
+  if (!user || user.role !== 'admin') {
+    throw new Error('Unauthorized: Super-Admin access required')
   }
   
   return user
@@ -338,7 +337,7 @@ export async function getFlaggedBookings() {
 /**
  * Get all users with pagination and filtering
  */
-export async function getUsers(page: number = 1, limit: number = 20, role?: 'client' | 'merchant') {
+export async function getUsers(page: number = 1, limit: number = 20, role?: 'client' | 'merchant' | 'admin') {
   try {
     await requireAdmin()
     const supabase = await createClient()

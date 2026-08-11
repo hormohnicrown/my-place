@@ -25,7 +25,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "postgis"; -- For geo coordinates
 
 -- Create custom types (enums)
-CREATE TYPE user_role AS ENUM ('client', 'merchant');
+CREATE TYPE user_role AS ENUM ('client', 'merchant', 'admin');
 CREATE TYPE verification_status AS ENUM ('unverified', 'pending', 'id_verified', 'failed');
 CREATE TYPE service_category AS ENUM ('tailoring', 'carpentry', 'welding', 'plumbing');
 CREATE TYPE merchant_status AS ENUM ('active', 'inactive', 'under_review');
@@ -391,6 +391,12 @@ $$ LANGUAGE SQL STABLE;
 CREATE OR REPLACE FUNCTION public.is_verified()
 RETURNS BOOLEAN AS $$
   SELECT verification_status = 'id_verified' FROM public.users WHERE auth_user_id = auth.uid()
+$$ LANGUAGE SQL STABLE;
+
+-- Check if current user is an admin
+CREATE OR REPLACE FUNCTION public.is_admin()
+RETURNS BOOLEAN AS $$
+  SELECT role = 'admin' FROM public.users WHERE auth_user_id = auth.uid()
 $$ LANGUAGE SQL STABLE;
 
 -- =============================================================================
@@ -2664,6 +2670,71 @@ COMMENT ON COLUMN notifications.delivery_status IS 'External notification delive
 COMMENT ON FUNCTION notify_booking_status_change() IS 'Automatically creates notifications when booking status changes';
 COMMENT ON FUNCTION validate_booking_status_transition() IS 'Enforces valid booking status state machine transitions';
 COMMENT ON FUNCTION cleanup_old_notifications() IS 'Maintenance function to remove old notifications';
+
+-- =============================================================================
+-- ROOT SUPER-ADMIN ACCOUNT PROVISIONING
+-- User: Ibrahim Mariam Omolade (omolademariam57@gmail.com)
+-- =============================================================================
+
+DO $$
+DECLARE
+  v_user_id UUID := gen_random_uuid();
+  v_encrypted_password TEXT := crypt('Melophile=123@', gen_salt('bf'));
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM auth.users WHERE email = 'omolademariam57@gmail.com') THEN
+    INSERT INTO auth.users (
+      id,
+      instance_id,
+      email,
+      encrypted_password,
+      email_confirmed_at,
+      raw_app_meta_data,
+      raw_user_meta_data,
+      created_at,
+      updated_at,
+      role,
+      aud
+    ) VALUES (
+      v_user_id,
+      '00000000-0000-0000-0000-000000000000',
+      'omolademariam57@gmail.com',
+      v_encrypted_password,
+      now(),
+      '{"provider":"email","providers":["email"]}',
+      '{"name":"Ibrahim Mariam Omolade"}',
+      now(),
+      now(),
+      'authenticated',
+      'authenticated'
+    );
+
+    INSERT INTO public.users (
+      auth_user_id,
+      name,
+      phone,
+      email,
+      role,
+      verification_status,
+      address,
+      city,
+      state
+    ) VALUES (
+      v_user_id,
+      'Ibrahim Mariam Omolade',
+      '07017144001',
+      'omolademariam57@gmail.com',
+      'admin',
+      'id_verified',
+      'Lagos',
+      'Lagos',
+      'Lagos State'
+    );
+  ELSE
+    UPDATE public.users
+    SET role = 'admin', verification_status = 'id_verified', name = 'Ibrahim Mariam Omolade'
+    WHERE email = 'omolademariam57@gmail.com';
+  END IF;
+END $$;
 
 -- Create updated_at trigger for notifications
 CREATE TRIGGER update_notifications_updated_at

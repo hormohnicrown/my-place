@@ -27,7 +27,7 @@ export default async function LaunchReadinessPage() {
   const user = await getCurrentUser()
 
   // Basic admin check
-  if (!user || user.role !== 'merchant') {
+  if (!user || user.role !== 'admin') {
     redirect('/login')
   }
 

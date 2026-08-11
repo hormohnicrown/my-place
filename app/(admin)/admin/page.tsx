@@ -9,7 +9,7 @@ export default async function AdminDashboard() {
   const user = await getCurrentUser()
 
   // Basic admin check - in production, you'd want proper role-based access
-  if (!user || user.role !== 'merchant') {
+  if (!user || user.role !== 'admin') {
     redirect('/login')
   }
 

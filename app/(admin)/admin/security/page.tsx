@@ -12,7 +12,7 @@ export default async function SecurityAuditPage() {
   const user = await getCurrentUser()
 
   // Basic admin check
-  if (!user || user.role !== 'merchant') {
+  if (!user || user.role !== 'admin') {
     redirect('/login')
   }
 

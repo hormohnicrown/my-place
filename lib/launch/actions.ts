@@ -8,7 +8,7 @@ import { launchChecklist, calculateReadinessScore, type CheckStatus, type Launch
 async function requireAdmin() {
   const user = await getCurrentUser()
   
-  if (!user || user.role !== 'merchant') {
+  if (!user || user.role !== 'admin') {
     throw new Error('Admin access required for launch management')
   }
   
