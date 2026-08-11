@@ -5,10 +5,11 @@ import { Users, AlertTriangle, Shield, Activity, Calendar, DollarSign, Star, Fla
 import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
+import { AdminNavbar } from '@/components/navigation/AdminNavbar'
+
 export default async function AdminDashboard() {
   const user = await getCurrentUser()
 
-  // Basic admin check - in production, you'd want proper role-based access
   if (!user || user.role !== 'admin') {
     redirect('/login')
   }
@@ -30,28 +31,7 @@ export default async function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
-              <p className="text-gray-600 mt-1">Monitor and manage My Place platform</p>
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-500">
-                Welcome back, {user.name}
-              </span>
-              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                <span className="text-blue-600 font-medium text-sm">
-                  {user.name?.charAt(0).toUpperCase()}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
+      <AdminNavbar userName={user.name} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Quick Stats */}

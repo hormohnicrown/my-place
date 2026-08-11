@@ -4,6 +4,7 @@ import { getCurrentUser } from '@/lib/auth/actions'
 import { getMerchantListings } from '@/lib/merchant/actions'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { MerchantNavbar } from '@/components/navigation/MerchantNavbar'
 
 export default async function MerchantDashboard() {
   const user = await getCurrentUser()
@@ -38,31 +39,7 @@ export default async function MerchantDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-2xl font-bold">My Place</h1>
-              <p className="text-sm text-muted-foreground">Artisan Dashboard</p>
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="text-right">
-                <p className="text-sm font-medium">{user.name}</p>
-                <p className="text-xs text-muted-foreground">Artisan</p>
-                {merchantProfile && (
-                  <p className="text-xs text-primary capitalize">{merchantProfile.category}</p>
-                )}
-              </div>
-              <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                <span className="text-primary font-medium">
-                  {user.name.charAt(0).toUpperCase()}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
+      <MerchantNavbar userName={user.name} category={merchantProfile?.category} />
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

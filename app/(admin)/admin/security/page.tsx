@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Shield, AlertTriangle, CheckCircle, XCircle, Clock, Lock, Server, Code, Database, Key, FileText } from 'lucide-react'
 import Link from 'next/link'
+import { AdminNavbar } from '@/components/navigation/AdminNavbar'
 import { securityChecks, calculateSecurityScore, productionHardeningChecklist } from '@/lib/security/audit'
 import { SecurityActions } from './security-actions'
 import type { SecurityCategory } from '@/lib/security/audit'
@@ -78,6 +79,7 @@ export default async function SecurityAuditPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <AdminNavbar userName={user.name} />
       {/* Header */}
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">

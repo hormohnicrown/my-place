@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Users, User, Phone, Mail, MapPin, Calendar, Search, Filter, ChevronLeft, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { UserManagementActions } from './user-actions'
+import { AdminNavbar } from '@/components/navigation/AdminNavbar'
 
 type SearchParams = {
   page?: string
@@ -54,6 +55,7 @@ export default async function UsersManagementPage({
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <AdminNavbar userName={user.name} />
       {/* Header */}
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">

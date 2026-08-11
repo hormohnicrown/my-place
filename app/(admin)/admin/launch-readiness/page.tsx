@@ -20,6 +20,7 @@ import {
   Download
 } from 'lucide-react'
 import Link from 'next/link'
+import { AdminNavbar } from '@/components/navigation/AdminNavbar'
 import { ChecklistSection } from './checklist-section'
 import { LaunchActions } from './launch-actions'
 
@@ -81,6 +82,7 @@ export default async function LaunchReadinessPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <AdminNavbar userName={user.name} />
       {/* Header */}
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">

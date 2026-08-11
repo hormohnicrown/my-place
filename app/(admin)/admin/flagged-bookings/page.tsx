@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { AlertTriangle, User, Calendar, DollarSign, MapPin, Clock, Shield, Eye, CheckCircle, XCircle } from 'lucide-react'
 import Link from 'next/link'
+import { AdminNavbar } from '@/components/navigation/AdminNavbar'
 
 export default async function FlaggedBookingsPage() {
   const user = await getCurrentUser()
@@ -70,6 +71,7 @@ export default async function FlaggedBookingsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <AdminNavbar userName={user.name} />
       {/* Header */}
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">

@@ -5,7 +5,8 @@ import { getClientBookingRequests, searchMerchants, searchListings } from '@/lib
 import { getCurrentUser } from '@/lib/auth/actions'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { MapPin, Star, Clock, Calendar, Search, Filter, Eye, Plus, ArrowRight, User, MessageSquare } from 'lucide-react'
+import { MapPin, Star, Clock, Calendar, Search, Filter, Eye, Plus, ArrowRight, User as UserIcon, MessageSquare } from 'lucide-react'
+import { ClientNavbar } from '@/components/navigation/ClientNavbar'
 
 type DashboardStats = {
   pendingRequests: number
@@ -136,28 +137,7 @@ export default function ClientDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-2xl font-bold">My Place</h1>
-              <p className="text-sm text-gray-600">Find skilled artisans near you</p>
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="text-right">
-                <p className="text-sm font-medium">{user.name}</p>
-                <p className="text-xs text-gray-600">Client • {user.city}</p>
-              </div>
-              <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                <span className="text-blue-600 font-medium">
-                  {user.name.charAt(0).toUpperCase()}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
+      <ClientNavbar userName={user.name} city={user.city} />
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -402,7 +382,7 @@ export default function ClientDashboard() {
                         />
                       ) : (
                         <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center mr-3">
-                          <User className="h-5 w-5 text-gray-600" />
+                          <UserIcon className="h-5 w-5 text-gray-600" />
                         </div>
                       )}
                       <div className="flex-1 min-w-0">
