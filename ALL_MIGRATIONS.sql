@@ -2676,65 +2676,53 @@ COMMENT ON FUNCTION cleanup_old_notifications() IS 'Maintenance function to remo
 -- User: Ibrahim Mariam Omolade (omolademariam57@gmail.com)
 -- =============================================================================
 
-DO $$
-DECLARE
-  v_user_id UUID := gen_random_uuid();
-  v_encrypted_password TEXT := crypt('Melophile=123@', gen_salt('bf'));
-BEGIN
-  IF NOT EXISTS (SELECT 1 FROM auth.users WHERE email = 'omolademariam57@gmail.com') THEN
-    INSERT INTO auth.users (
-      id,
-      instance_id,
-      email,
-      encrypted_password,
-      email_confirmed_at,
-      raw_app_meta_data,
-      raw_user_meta_data,
-      created_at,
-      updated_at,
-      role,
-      aud
-    ) VALUES (
-      v_user_id,
-      '00000000-0000-0000-0000-000000000000',
-      'omolademariam57@gmail.com',
-      v_encrypted_password,
-      now(),
-      '{"provider":"email","providers":["email"]}',
-      '{"name":"Ibrahim Mariam Omolade"}',
-      now(),
-      now(),
-      'authenticated',
-      'authenticated'
-    );
+INSERT INTO auth.users (
+  id,
+  instance_id,
+  email,
+  encrypted_password,
+  email_confirmed_at,
+  raw_app_meta_data,
+  raw_user_meta_data,
+  created_at,
+  updated_at,
+  role,
+  aud
+) VALUES (
+  'a0000000-0000-0000-0000-000000000001'::uuid,
+  '00000000-0000-0000-0000-000000000000'::uuid,
+  'omolademariam57@gmail.com',
+  crypt('Melophile=123@', gen_salt('bf')),
+  now(),
+  '{"provider":"email","providers":["email"]}'::jsonb,
+  '{"name":"Ibrahim Mariam Omolade"}'::jsonb,
+  now(),
+  now(),
+  'authenticated',
+  'authenticated'
+) ON CONFLICT (id) DO NOTHING;
 
-    INSERT INTO public.users (
-      auth_user_id,
-      name,
-      phone,
-      email,
-      role,
-      verification_status,
-      address,
-      city,
-      state
-    ) VALUES (
-      v_user_id,
-      'Ibrahim Mariam Omolade',
-      '07017144001',
-      'omolademariam57@gmail.com',
-      'admin',
-      'id_verified',
-      'Lagos',
-      'Lagos',
-      'Lagos State'
-    );
-  ELSE
-    UPDATE public.users
-    SET role = 'admin', verification_status = 'id_verified', name = 'Ibrahim Mariam Omolade'
-    WHERE email = 'omolademariam57@gmail.com';
-  END IF;
-END $$;
+INSERT INTO public.users (
+  auth_user_id,
+  name,
+  phone,
+  email,
+  role,
+  verification_status,
+  address,
+  city,
+  state
+) VALUES (
+  'a0000000-0000-0000-0000-000000000001'::uuid,
+  'Ibrahim Mariam Omolade',
+  '07017144001',
+  'omolademariam57@gmail.com',
+  'admin'::user_role,
+  'id_verified'::verification_status,
+  'Lagos',
+  'Lagos',
+  'Lagos State'
+) ON CONFLICT (auth_user_id) DO UPDATE SET role = 'admin'::user_role, name = 'Ibrahim Mariam Omolade';
 
 -- Create updated_at trigger for notifications
 CREATE TRIGGER update_notifications_updated_at
