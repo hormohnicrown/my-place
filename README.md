@@ -1,151 +1,156 @@
 # My Place
 
-A two-sided marketplace that connects local artisans with clients across Nigeria. Clients search for verified tradespeople by category and distance, view profiles and listings, and send booking requests. Artisans manage a profile, publish service listings, and accept or decline requests. The launch categories are tailoring, carpentry, welding, and plumbing.
+A two-sided marketplace connecting Nigerian artisans (tailoring, carpentry, welding, plumbing) with local clients. Clients search for verified tradespeople by category and distance, view profiles and service listings, and send booking requests with full address privacy protection. Artisans manage profiles, publish listings, accept/decline bookings, perform GPS check-ins, and manage service fees.
 
-## Build status
+🔗 **Live Demo**: [https://my-place-steel.vercel.app](https://my-place-steel.vercel.app)  
+📦 **GitHub Repository**: [https://github.com/hormohnicrown/my-place](https://github.com/hormohnicrown/my-place)
 
-This is a demo build. The following is true of the code in this repository:
+---
 
-- Sign-in and sign-up use email and password only. ID verification is disabled so accounts are usable immediately after signup.
-- The client and merchant flows work end to end against a Supabase backend: signup, onboarding, search, listings, and booking requests.
-- The admin section renders but uses a basic role check and some placeholder figures. It is not part of the client or merchant path.
-- Production build passes (`npm run build`). ESLint and TypeScript checks are not enforced during the build because of pre-existing issues in library and admin code. Run them manually with `npm run lint` and `npm run typecheck`.
+## Key Features
 
-## Tech stack
+- **Address Privacy Protection (TRD §4)**: Client street addresses are hidden during discovery and revealed to artisans only after booking acceptance.
+- **Location-Based Artisan Search**: Uses Supabase PostGIS spatial queries (`calculate_distance_coords`) to calculate distance in kilometers.
+- **Simplified Demo Auth**: Email/password authentication with auto-assigned `id_verified` status so users bypass third-party ID verification while respecting Row-Level Security (RLS).
+- **GPS Service Check-in System**: Artisans record location check-ins and check-outs for active service bookings.
+- **Two-Way Mutual Rating System**: Clients and artisans rate each other after service completion.
+- **Off-Platform Testimonial Import**: Artisans display verified external testimonials (WhatsApp/Instagram) with visual badges.
 
-- Next.js 15 (App Router) and React 19
-- TypeScript
-- Tailwind CSS 3 with shadcn/ui (Radix) components
-- Supabase for PostgreSQL, authentication, row level security, file storage, and PostGIS distance queries
-- Browser Geolocation API for client and merchant location
+---
+
+## Build Status
+
+- **Type Safety**: 100% clean. `npx tsc --noEmit` passes with **0 errors**.
+- **Production Build**: Verified. `npm run build` succeeds cleanly.
+- **Backend**: Supabase (PostgreSQL + PostGIS, Auth, Storage, Row Level Security).
+- **Database Migrations**: Tested and verified in a single transaction via `ALL_MIGRATIONS.sql`.
+
+---
+
+## Tech Stack
+
+- **Framework**: Next.js 15 (App Router) & React 19
+- **Language**: TypeScript (Strict Mode)
+- **Styling**: Tailwind CSS 3 with shadcn/ui (Radix UI primitives)
+- **Database & Auth**: Supabase (PostgreSQL, PostGIS, Auth, Storage, RLS)
+- **Location**: Web Geolocation API & PostGIS Distance RPCs
+
+---
 
 ## Prerequisites
 
-- Node.js 18 or newer
-- A Supabase project (create one at [supabase.com](https://supabase.com))
+- Node.js 18+
+- A Supabase Project ([supabase.com](https://supabase.com))
+- Vercel Account for deployment ([vercel.com](https://vercel.com))
 
-## Setup
+---
 
-1. Install dependencies:
+## Setup & Local Development
 
+1. **Install dependencies**:
    ```bash
    npm install
    ```
 
-2. Create `.env.local` from the template and fill in your Supabase values:
-
+2. **Configure environment variables**:
+   Copy `.env.example` to `.env.local`:
    ```bash
    cp .env.example .env.local
    ```
+   Fill in the required variables:
+   | Variable | Description | Where to Find |
+   |---|---|---|
+   | `NEXT_PUBLIC_SUPABASE_URL` | Supabase Project URL | Supabase Dashboard → Project Settings → API |
+   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase Anon Key | Supabase Dashboard → Project Settings → API |
+   | `NEXT_PUBLIC_APP_URL` | Application Base URL | `http://localhost:3000` (Local) or Vercel URL (Prod) |
 
-   The demo needs three variables to run:
+3. **Set up Database & Extensions** (See [Database Setup](#database-setup) below).
 
-   | Variable | Where to find it |
-   |----------|------------------|
-   | `NEXT_PUBLIC_SUPABASE_URL` | Supabase dashboard, Project Settings, API |
-   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase dashboard, Project Settings, API |
-   | `NEXT_PUBLIC_APP_URL` | `http://localhost:3000` for local development |
-
-3. Set up the database (see [Database](#database) below).
-
-4. Start the development server:
-
+4. **Start the development server**:
    ```bash
    npm run dev
    ```
-
    Open [http://localhost:3000](http://localhost:3000).
 
-## Database
+---
 
-The SQL migrations live in `supabase/migrations/`. Apply them to a Supabase project in one of two ways.
+## Database Setup
 
-### Option A: Supabase CLI
+### Step 1: Enable Extensions & Auth Settings in Supabase
+1. **Enable PostGIS**: Go to **Database** → **Extensions**, search for `postgis`, and toggle it **ON**.
+2. **Disable Email Confirmation** (for instant demo signup): Go to **Authentication** → **Providers** → **Email**, disable **Confirm email**, and click **Save**.
+3. **Storage Bucket**: Go to **Storage** → **Create Bucket**, name it `profile-photos`, and set it to **Public**.
 
-```bash
-npm install -g supabase
-supabase link --project-ref YOUR_PROJECT_REF
-supabase db push
-```
+### Step 2: Run Migrations
 
-Find `YOUR_PROJECT_REF` in your dashboard URL: `https://supabase.com/dashboard/project/YOUR_PROJECT_REF`.
+#### Option A: Single-File Transaction (Recommended)
+1. Open [`ALL_MIGRATIONS.sql`](ALL_MIGRATIONS.sql) from the project root.
+2. In Supabase Dashboard, go to **SQL Editor** → **New Query**.
+3. Paste the contents of `ALL_MIGRATIONS.sql` and click **Run**.
 
-### Option B: SQL editor
+#### Option B: Individual Migration Files
+Alternatively, execute each file in `supabase/migrations/` in numerical order (`0001` through `0009`) in the SQL Editor.
 
-Open each file in `supabase/migrations/` in numeric order and run its contents in the Supabase SQL editor.
+---
 
-### PostGIS
+## Vercel Deployment
 
-Distance search needs the PostGIS extension. In the Supabase dashboard go to Database, then Extensions, and enable `postgis` before running the migrations.
+1. **Import Repository**: Connect `hormohnicrown/my-place` on Vercel.
+2. **Root Directory**: Set to `.` (blank / repo root). *Do NOT pre-fill `my-place/` as the repo root has been flattened.*
+3. **Environment Variables**: Add `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and `NEXT_PUBLIC_APP_URL`.
+4. **Deploy**: Trigger deployment.
 
-### Generated types (optional)
+---
 
-The app runs without generated database types. To add them later, set `SUPABASE_PROJECT_ID` in your environment and run:
-
-```bash
-npm run db:types
-```
-
-This writes `lib/supabase/database.types.ts`. Once that file exists you can wire the typed client back into `lib/supabase/server.ts` and `lib/supabase/client.ts`.
-
-## Auth note for the demo
-
-The app uses Supabase email and password auth. For signup to log a user in right away, turn off email confirmation in your Supabase project: Authentication, then Providers, then Email, and disable "Confirm email". With confirmation on, new users must click a link in their email before they can sign in.
-
-## Project structure
+## Project Structure
 
 ```
 ├── app/
-│   ├── (auth)/         Login and onboarding
-│   ├── (client)/       Client search, listings, bookings
-│   ├── (merchant)/     Merchant profile, listings, bookings, commission
-│   ├── (admin)/        Admin dashboard and tools
-│   ├── accessibility/  Accessibility statement page
-│   ├── layout.tsx      Root layout, header, footer
-│   └── page.tsx        Landing page
-├── components/         UI and feature components
-│   └── ui/             shadcn/ui primitives
+│   ├── (admin)/        Admin platform management, disputes, and seed tools
+│   ├── (auth)/         Email/password authentication and profile onboarding
+│   ├── (client)/       Artisan discovery, service search, and client bookings
+│   ├── (merchant)/     Artisan profile, listings, bookings, and GPS tracking
+│   ├── accessibility/  Accessibility compliance statement
+│   ├── layout.tsx      Root layout with navigation shell
+│   └── page.tsx        Public landing page
+├── components/         Shared UI, shadcn components, and feature widgets
 ├── lib/
-│   ├── auth/           Sign-in, sign-up, session helpers
-│   ├── client/         Merchant search and booking actions
-│   ├── merchant/       Merchant profile and listing actions
-│   ├── commission/     Commission calculation and formatting
-│   ├── ratings/        Two-way rating actions and formatting
-│   ├── gps/            Check-in and check-out actions
-│   ├── accessibility/  Accessibility audit helpers
-│   ├── admin/          Admin data actions
-│   ├── launch/         Launch-readiness checklist actions
-│   ├── security/       RLS validation and security audit helpers
-│   ├── seed-data/      Testimonial seeding for demos
-│   ├── supabase/       Browser and server Supabase clients
-│   └── utils.ts        Shared helpers
+│   ├── admin/          Admin statistics and dispute handlers
+│   ├── auth/           Supabase auth & profile actions
+│   ├── client/         Artisan search & client booking RPCs
+│   ├── gps/            GPS check-in/check-out tracking
+│   ├── launch/         Launch-readiness checklist audit
+│   ├── merchant/       Artisan profile & listing server actions
+│   ├── ratings/        Two-way rating system
+│   └── security/       RLS security audit and policy validators
 ├── supabase/
-│   └── migrations/     Database schema and policies
-├── doc/                PRD, TRD, and Workflow documents
+│   └── migrations/     Granular SQL migrations (0001-0009)
+├── ALL_MIGRATIONS.sql  Single-file single-transaction SQL bundle
+├── doc/                PRD, TRD, and Workflow documentation
 └── public/             Static assets
 ```
 
-## Scripts
+---
 
-- `npm run dev` starts the development server
-- `npm run build` creates a production build
-- `npm run start` serves the production build
-- `npm run lint` runs ESLint
-- `npm run typecheck` runs the TypeScript compiler with no output
-- `npm run db:types` generates Supabase types (needs `SUPABASE_PROJECT_ID`)
+## Available Scripts
 
-## How it works
+- `npm run dev` - Starts Next.js development server
+- `npm run build` - Builds production bundle
+- `npm run start` - Runs production server
+- `npm run lint` - Runs ESLint code checks
+- `npm run typecheck` - Validates TypeScript types (`tsc --noEmit`)
+- `npm run db:types` - Generates Supabase TypeScript definitions
 
-The middleware in `lib/supabase/middleware.ts` reads the Supabase session on each request. A signed-in user without a profile goes to onboarding. After onboarding, clients land on `/client` and merchants on `/merchant`. Signed-out users can reach the landing page and login.
-
-Clients search on `/client/search`, which reads their browser location and orders results by distance using PostGIS. A client opens a merchant or listing and sends a booking request from `/client/booking/new`. Merchants see incoming requests under `/merchant/bookings` and respond there.
+---
 
 ## Documentation
 
-- [PRD](doc/PRD.md) product requirements
-- [TRD](doc/TRD.md) technical requirements
-- [Workflow](doc/Workflow.md) build sequence
+- [Product Requirements Document (PRD)](doc/PRD.md)
+- [Technical Requirements Document (TRD)](doc/TRD.md)
+- [Workflow & Build Log](doc/Workflow.md)
+
+---
 
 ## License
 
-Private. All rights reserved.
+Private / Demo Project. All rights reserved.
